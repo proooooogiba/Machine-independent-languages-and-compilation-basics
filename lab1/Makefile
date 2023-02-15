@@ -8,7 +8,7 @@ help:
 	@echo ' add -m elf_i386 to nasm command if you are using 32-bit system on 64-bit OS '
 $(TARGET): $(TARGET).asm
 	nasm -f elf64 -l $(TARGET).lst $(TARGET).asm
-	ld -m elf_i386 -o $(TARGET) $(TARGET).o
+	ld -o $(TARGET) $(TARGET).o
 run: $(TARGET)
 	./$(TARGET)
 debug: $(TARGET)

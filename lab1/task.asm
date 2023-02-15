@@ -1,13 +1,21 @@
 section .data; сегмент инициализированных переменных
     ExitMsg db "Press Enter to Exit",10 ; выводимое сообщение
     lenExit equ $-ExitMsg
+    A dw -30
+    B dw 21
 ; сегмент неинициализированных переменных
 section .bss
     InBuf resb 10 ; буфер для вводимой строки
     lenIn equ $-InBuf
+    X resd 1
+
 section .text ; сегмент кода
 global _start
 _start:
+    mov EAX,[A] ; загрузить число A в регистр EAX
+    add EAX,5
+    sub EAX,[B] ; вычесть число B, результат в EAX
+    mov [X],EAX ; сохранить результат в памяти
     ; write
     mov rax, 1; системная функция 1 (write)
     mov rdi, 1; дескриптор файла stdout=1
