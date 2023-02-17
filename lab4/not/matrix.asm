@@ -1,6 +1,11 @@
 %include "lib.asm"
 
 section .data
+matrix: dd -1,  2,  3, -4
+        dd -1,  2, -3,  4
+        dd -1, -2, -3, -4
+        dd  1, -2, -3,  4
+        dd  1, -2, -3, -4
 
 section .bss
     OutBuf resb 10 ; буфер для выводимой строки
