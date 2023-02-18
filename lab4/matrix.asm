@@ -2,7 +2,7 @@
 
 section .data
     ExitMsg db "Line with zero sum is found", 0xA ; выводимое сообщение
-    Space db " "
+    Space db "  "
     NewLine: db 0xA
     lenExit equ $-ExitMsg
 
@@ -20,7 +20,7 @@ section .data
 
 
 section .bss
-    matrix resd 16
+    matrix resd 20
     OutBuf resb 2 ; буфер для выводимой строки, он должен быть 2 или 4
                   ;должен быть 4, но пока оставим костыль, можно ввожить только 0 
     lenOut equ $-OutBuf
@@ -45,10 +45,10 @@ _start:
     syscall
 
     mov rbx, 0 ; смещение элемента столбца в строке
-    mov rcx, 2 ; количество строк
-    push rcx ; сохраняем счетчик
+    mov rcx, 5 ; количество строк
 cycleInput1:; мы проходимся по столбцам
-    mov rcx, 1 ; счетчик элементов в столбце - 1
+    push rcx ; сохраняем счетчик
+    mov rcx, 3 ; счетчик элементов в столбце - 1
     
     push rcx ; сохраняем счетчик
     push rbx
@@ -97,7 +97,7 @@ cycleInput2:
     syscall
 
     pop rcx
-    add rbx, 8 ; перешли к следующей строке
+    add rbx, 16 ; перешли к следующей строке
     dec rcx
     jnz cycleInput1 ; цикл по столбцам
 
@@ -108,13 +108,11 @@ cycleInput2:
     syscall
 
     mov rbx, 0 ; смещение элемента столбца в строке
-    mov rcx, 2 ; количество строк
-    
-
+    mov rcx, 5 ; количество строк
 ; мы проходимся по столбцам
 cyclePrint1: 
     push rcx ; сохраняем счетчик
-    mov rcx, 1 ; счетчик элементов в столбцов - 1
+    mov rcx, 3 ; счетчик элементов в столбцов - 1
     
     push rcx ; сохраняем счетчик
     push rsi
@@ -178,7 +176,7 @@ cyclePrint2:
 
     pop rcx
 
-    add rbx, 8 ; перешли к следующей строке
+    add rbx, 16 ; перешли к следующей строке
     dec rcx
     jnz cyclePrint1 ; цикл по столбцам
 
@@ -191,10 +189,10 @@ cyclePrint2:
 
     ;я ёбаный гений блять
     mov rbx, 0 ; смещение элемента столбца в строке
-    mov rcx, 2 ; количество строк
+    mov rcx, 5 ; количество строк
 cycle1:
     push rcx ; сохраняем счетчик
-    mov rcx, 1 ; счетчик элементов в строке - 1
+    mov rcx, 3 ; счетчик элементов в строке - 1
     mov rax, [rbx + matrix]; будем использовать как сумму элементов для строки
     mov rsi, 4 ; проходимся по элементам строки
 cycle2:
@@ -207,7 +205,7 @@ cycle2:
                 ;пришлось заменять на eax, не приятно конечно,но терпимо
     je if_zero
 
-    mov rcx, 1 ; счетчик элементов в столбце
+    mov rcx, 3 ; счетчик элементов в столбце
     ;здесь нужно сделать printf всей строки
     push rcx ; сохраняем счетчик
     push rsi
@@ -255,23 +253,24 @@ cyclePrintOut:
     mov rdx, 1
     syscall
 
-    ; print the space    
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, NewLine
-    mov rdx, 1
-    syscall
-
     pop rsi
 
     add rsi, 4; смещение для другого столбца, но все той-же строки
     pop rcx
    loop cyclePrintOut
 
+    ; print the NewLine    
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, NewLine
+    mov rdx, 1
+    syscall
+
 if_zero:
     pop rcx ; восстановили счетчик
-    add rbx, 8 ; перешли к следующей строке
+    add rbx, 16 ; перешли к следующей строке
     dec rcx
+    
     jnz cycle1 ; цикл по строкам
 
 exit:
