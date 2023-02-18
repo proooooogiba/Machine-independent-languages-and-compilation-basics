@@ -64,7 +64,6 @@ _start:
     ;content of InBuf goes to rax
     mov [B], rax
 
-
     ;CALCULATIONS
     mov rax, [A]
     mov rbx, [A]
