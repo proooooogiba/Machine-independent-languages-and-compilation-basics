@@ -78,125 +78,203 @@
     78 000000A8 C3                  <1>          ret
      2                                  
      3                                  section .data
-     4 00000000 FEFFFFFF02000000        matrix: dd -2, 2
+     4 00000000 FEFFFFFF03000000        matrix: dd -2, 3
      5 00000008 FDFFFFFF03000000                dd -3, 3
      6                                  
-     7 00000010 4C696E652077697468-     ExitMsg db "Line with zero sum is found", 10 ; выводимое сообщение
+     7 00000010 4C696E652077697468-     ExitMsg db "Line with zero sum is found", 0xA ; выводимое сообщение
      7 00000019 207A65726F2073756D-
      7 00000022 20697320666F756E64-
      7 0000002B 0A                 
-     8                                  lenExit equ $-ExitMsg
-     9                                  
-    10                                  section .bss
-    11 00000000 <res Ah>                    OutBuf resb 10 ; буфер для выводимой строки
-    12                                      lenOut equ $-OutBuf
-    13 0000000A <res Ah>                    buf   resb 10
-    14 00000014 <res Ah>                    res   resb 10
-    15 0000001E <res Ah>                    InBuf resb 10 ; буфер для вводимой строки
-    16 00000028 <res Ah>                    counter resb 10
-    17                                      lenIn equ $-InBuf
-    18                                      
-    19                                  
-    20                                  section .text
-    21                                      global _start
-    22                                  
-    23                                  _start:
+     8 0000002C 200A                    Space db " ", 0xA
+     9 0000002E 0A                      NewLine: db 0xA
+    10                                  lenExit equ $-ExitMsg
+    11                                  
+    12 0000002F 526573756C74206D61-     ResMsg db "Result matrix looks following : ", 0xA ; выводимое сообщение
+    12 00000038 74726978206C6F6F6B-
+    12 00000041 7320666F6C6C6F7769-
+    12 0000004A 6E67203A200A       
+    13                                  lenRes equ $-ResMsg
+    14                                  
+    15                                  section .bss
+    16 00000000 ????                        OutBuf resb 2 ; буфер для выводимой строки, он должен быть 2 или 4
+    17                                      lenOut equ $-OutBuf
+    18                                  
+    19 00000002 ????????????????            Buf   resb 8
+    20                                      lineBuf equ $-Buf
+    21 0000000A <res Ah>                    res   resb 10
+    22 00000014 <res Ah>                    InBuf resb 10 ; буфер для вводимой строки
+    23                                      lenIn equ $-InBuf
     24                                  
-    25                                  ;     mov rbx, 0 ; смещение элемента столбца в строке
-    26                                  ;     mov rcx, 2 ; количество столбцов
-    27                                  ; ;мы проходимся по столбцам
-    28                                  ; cyclePrint1: 
-    29                                  ;     push rcx ; сохраняем счетчик
-    30                                  ;     mov rcx, 1 ; счетчик элементов в столбце
-    31                                      
-    32                                  ;     push rcx ; сохраняем счетчик
-    33                                  ;     push rsi
-    34                                  
-    35                                  ;     mov rax, [rbx + matrix]
-    36                                  ;     mov rsi, OutBuf
-    37                                  ;     call IntToStr64
-    38                                  
-    39                                  ;     ; print the number    
-    40                                  ;     mov rax, 1
-    41                                  ;     mov rdi, 1
+    25                                  section .text
+    26                                      global _start
+    27                                  
+    28                                  _start:
+    29                                  
+    30                                      ; mov rbx, 0 ; смещение элемента столбца в строке
+    31                                      ; mov rcx, 2 ; количество столбцов
+    32                                      
+    33                                  ;мы проходимся по столбцам
+    34                                  ; cyclePrint1: 
+    35                                  ;     push rcx ; сохраняем счетчик
+    36                                  ;     mov rcx, 1 ; счетчик элементов в столбце
+    37                                      
+    38                                  ;     push rcx ; сохраняем счетчик
+    39                                  ;     push rsi
+    40                                  
+    41                                  ;     mov rax, [rbx + matrix]
     42                                  ;     mov rsi, OutBuf
-    43                                  ;     mov rdx, lenOut
-    44                                  ;     syscall
-    45                                  
-    46                                  ;     pop rsi
-    47                                  ;     pop rcx
-    48                                  
-    49                                  ;     mov rsi, 4 ; смещение для другого столбца, но все той-же строки
-    50                                  ; cyclePrint2:
-    51                                  ;     push rcx ; сохраняем счетчик
-    52                                  ;     push rsi
-    53                                  
-    54                                  ;     mov rax, [rbx + rsi + matrix]
-    55                                  ;     mov rsi, OutBuf
-    56                                  ;     call IntToStr64
-    57                                  
-    58                                  ;     ; print the number    
-    59                                  ;     mov rax, 1
-    60                                  ;     mov rdi, 1
-    61                                  ;     mov rsi, OutBuf
-    62                                  ;     mov rdx, lenOut
-    63                                  ;     syscall
-    64                                  
-    65                                  ;     pop rsi
+    43                                  ;     call IntToStr64
+    44                                  
+    45                                  ;     ; print the number    
+    46                                  ;     mov rax, 1
+    47                                  ;     mov rdi, 1
+    48                                  ;     mov rsi, OutBuf
+    49                                  ;     mov rdx, lenOut
+    50                                  ;     syscall
+    51                                  
+    52                                  ;     ; print the number    
+    53                                  ;     mov rax, 1
+    54                                  ;     mov rdi, 1
+    55                                  ;     mov rsi, Space
+    56                                  ;     mov rdx, 1
+    57                                  ;     syscall
+    58                                  
+    59                                  ;     pop rsi
+    60                                  ;     pop rcx
+    61                                  
+    62                                  ;     mov rsi, 4 ; смещение для другого столбца, но все той-же строки
+    63                                  ; cyclePrint2:
+    64                                  ;     push rcx ; сохраняем счетчик
+    65                                  ;     push rsi
     66                                  
-    67                                  ;     add rsi, 4; смещение для другого столбца, но все той-же строки
-    68                                  ;     pop rcx
-    69                                  ;     loop cyclePrint2 ; цикл по элементам столбца
-    70                                  ;     pop rcx ; восстановили счетчик
-    71                                  ;     add rbx, 8 ; перешли к следующей строке
-    72                                  ;     dec rcx
-    73                                  ;     jnz cyclePrint1 ; цикл по столбцам
-    74                                  
-    75                                  
-    76                                  
+    67                                  ;     mov rax, [rbx + rsi + matrix]
+    68                                  ;     mov rsi, OutBuf
+    69                                  ;     call IntToStr64
+    70                                  
+    71                                  ;     ; print the number    
+    72                                  ;     mov rax, 1
+    73                                  ;     mov rdi, 1
+    74                                  ;     mov rsi, OutBuf
+    75                                  ;     mov rdx, lenOut
+    76                                  ;     syscall
     77                                  
-    78                                  
-    79                                  
-    80                                  
-    81                                  
-    82                                  
-    83                                  
-    84 000000A9 BB00000000                  mov rbx, 0 ; смещение элемента столбца в строке
-    85 000000AE B902000000                  mov rcx, 2 ; количество столбцов
-    86                                  cycle1:
-    87 000000B3 51                          push rcx ; сохраняем счетчик
-    88 000000B4 B901000000                  mov rcx, 1 ; счетчик элементов в столбце - 1
-    89 000000B9 488B83[00000000]            mov rax, [rbx + matrix]; будем использовать как сумму элементов для строки
-    90 000000C0 BE04000000                  mov rsi, 4 ; проходимся по элементам строки
-    91                                  cycle2:
-    92 000000C5 48038433[00000000]          add rax, [rbx + rsi + matrix]
-    93                                  
-    94 000000CD 4883C604                    add rsi, 4 ; проходимся по элементам строки
-    95 000000D1 E2F2                        loop cycle2 ; цикл по элементам столбца
-    96                                  
-    97                                      ;если сумма равна нулю, то выводим 'блин, блинский'
-    98 000000D3 83F800                      cmp eax, 0
-    99 000000D6 751F                        jne next
-   100                                  
-   101 000000D8 56                          push rsi
-   102 000000D9 51                          push rcx
-   103                                      
-   104 000000DA B801000000                  mov rax, 1; системная функция 1 (write)
-   105 000000DF BF01000000                  mov rdi, 1; дескриптор файла stdout=1
-   106 000000E4 48BE-                       mov rsi, ExitMsg ; адрес выводимой строки
-   106 000000E6 [1000000000000000] 
-   107 000000EE BA1C000000                  mov rdx, lenExit ; длина строки
-   108 000000F3 0F05                        syscall; вызов системной функции
-   109                                      
-   110 000000F5 59                          pop rcx
-   111 000000F6 5E                          pop rsi
-   112                                  next:
-   113 000000F7 59                          pop rcx ; восстановили счетчик
-   114 000000F8 4883C308                    add rbx, 8 ; перешли к следующей строке
-   115 000000FC 48FFC9                      dec rcx
-   116 000000FF 75B2                        jnz cycle1 ; цикл по столбцам
-   117                                  
-   118                                  exit:
-   119 00000101 B83C000000                  mov rax, 60; системная функция 60 (exit)
-   120 00000106 4831FF                      xor rdi, rdi; return code 0
-   121 00000109 0F05                        syscall; вызов системной функции
+    78                                  ;     ; print the space    
+    79                                  ;     mov rax, 1
+    80                                  ;     mov rdi, 1
+    81                                  ;     mov rsi, Space
+    82                                  ;     mov rdx, 1
+    83                                  ;     syscall
+    84                                  
+    85                                  ;     pop rsi
+    86                                  
+    87                                  ;     add rsi, 4; смещение для другого столбца, но все той-же строки
+    88                                  ;     pop rcx
+    89                                  ;     loop cyclePrint2 ; цикл по элементам столбца
+    90                                  
+    91                                  ;     ; print the NewLinw character
+    92                                  ;     mov rax, 1
+    93                                  ;     mov rdi, 1
+    94                                  ;     mov rsi, NewLine
+    95                                  ;     mov rdx, 1
+    96                                  ;     syscall
+    97                                  
+    98                                  ;     pop rcx
+    99                                  
+   100                                  ;     add rbx, 8 ; перешли к следующей строке
+   101                                  ;     dec rcx
+   102                                  ;     jnz cyclePrint1 ; цикл по столбцам
+   103                                  
+   104                                  
+   105                                  
+   106                                  
+   107                                  
+   108                                  
+   109                                      ;я ёбаный гений блять
+   110 000000A9 BB00000000                  mov rbx, 0 ; смещение элемента столбца в строке
+   111 000000AE B902000000                  mov rcx, 2 ; количество строк
+   112                                  cycle1:
+   113 000000B3 51                          push rcx ; сохраняем счетчик
+   114 000000B4 B901000000                  mov rcx, 1 ; счетчик элементов в строке - 1
+   115 000000B9 488B83[00000000]            mov rax, [rbx + matrix]; будем использовать как сумму элементов для строки
+   116 000000C0 BE04000000                  mov rsi, 4 ; проходимся по элементам строки
+   117                                  cycle2:
+   118 000000C5 48038433[00000000]          add rax, [rbx + rsi + matrix]
+   119 000000CD 4883C604                    add rsi, 4 ; проходимся по элементам строки
+   120 000000D1 E2F2                        loop cycle2 ; цикл по элементам столбца
+   121                                  
+   122                                      ;если сумма равна нулю, то мы сразу переходим к новой строке, иначе мы печатаем строку
+   123 000000D3 83F800                      cmp eax, 0  ; не знаю почему,но во внутреннем представлении rax когда он должен быть равен нулю,но он ему совсем не равен
+   124                                                  ;пришлось заменять на eax, не приятно конечно,но терпимо
+   125 000000D6 0F84B1000000                je zero
+   126                                  
+   127 000000DC B901000000                  mov rcx, 1 ; счетчик элементов в столбце
+   128                                      ;здесь нужно сделать printf всей строки
+   129 000000E1 51                          push rcx ; сохраняем счетчик
+   130 000000E2 56                          push rsi
+   131 000000E3 488B83[00000000]            mov rax, [rbx + matrix]
+   132 000000EA 48BE-                       mov rsi, OutBuf
+   132 000000EC [0000000000000000] 
+   133 000000F4 E807FFFFFF                  call IntToStr64
+   134                                  
+   135                                      ; print the number    
+   136 000000F9 B801000000                  mov rax, 1
+   137 000000FE BF01000000                  mov rdi, 1
+   138 00000103 48BE-                       mov rsi, OutBuf
+   138 00000105 [0000000000000000] 
+   139 0000010D BA02000000                  mov rdx, lenOut
+   140 00000112 0F05                        syscall
+   141                                  
+   142                                      ; print the number    
+   143 00000114 B801000000                  mov rax, 1
+   144 00000119 BF01000000                  mov rdi, 1
+   145 0000011E 48BE-                       mov rsi, Space
+   145 00000120 [2C00000000000000] 
+   146 00000128 BA01000000                  mov rdx, 1
+   147 0000012D 0F05                        syscall
+   148                                  
+   149 0000012F 5E                          pop rsi
+   150 00000130 59                          pop rcx
+   151                                  
+   152 00000131 BE04000000                  mov rsi, 4 ; смещение для другого столбца, но все той-же строки
+   153                                  cyclePrintOut:
+   154 00000136 51                          push rcx ; сохраняем счетчик
+   155 00000137 56                          push rsi
+   156                                  
+   157 00000138 488B8433[00000000]          mov rax, [rbx + rsi + matrix]
+   158 00000140 48BE-                       mov rsi, OutBuf
+   158 00000142 [0000000000000000] 
+   159 0000014A E8B1FEFFFF                  call IntToStr64
+   160                                  
+   161                                      ; print the number    
+   162 0000014F B801000000                  mov rax, 1
+   163 00000154 BF01000000                  mov rdi, 1
+   164 00000159 48BE-                       mov rsi, OutBuf
+   164 0000015B [0000000000000000] 
+   165 00000163 BA02000000                  mov rdx, lenOut
+   166 00000168 0F05                        syscall
+   167                                  
+   168                                      ; print the space    
+   169 0000016A B801000000                  mov rax, 1
+   170 0000016F BF01000000                  mov rdi, 1
+   171 00000174 48BE-                       mov rsi, Space
+   171 00000176 [2C00000000000000] 
+   172 0000017E BA01000000                  mov rdx, 1
+   173 00000183 0F05                        syscall
+   174                                  
+   175 00000185 5E                          pop rsi
+   176                                  
+   177 00000186 4883C604                    add rsi, 4; смещение для другого столбца, но все той-же строки
+   178 0000018A 59                          pop rcx
+   179 0000018B E2A9                       loop cyclePrintOut
+   180                                  
+   181                                  zero:
+   182 0000018D 59                          pop rcx ; восстановили счетчик
+   183                                  
+   184 0000018E 4883C308                    add rbx, 8 ; перешли к следующей строке
+   185 00000192 48FFC9                      dec rcx
+   186 00000195 0F8518FFFFFF                jnz cycle1 ; цикл по строкам
+   187                                  
+   188                                  exit:
+   189 0000019B B83C000000                  mov rax, 60; системная функция 60 (exit)
+   190 000001A0 4831FF                      xor rdi, rdi; return code 0
+   191 000001A3 0F05                        syscall; вызов системной функции
