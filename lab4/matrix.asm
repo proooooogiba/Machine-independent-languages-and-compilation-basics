@@ -31,18 +31,8 @@ section .text
     global _start
 
 _start:
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, InputMsg
-    mov rdx, lenInput
-    syscall
-
-    ; print line element's expectation
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, InputLineMsg
-    mov rdx, lenLineInput
-    syscall
+    call PrintInputMsg
+    call PrintInputLineMsg
 
     mov rbx, 0 ; смещение элемента столбца в строке
     mov rcx, 5 ; количество строк
@@ -52,11 +42,7 @@ cycleInput1:; мы проходимся по столбцам
     
     push rcx ; сохраняем счетчик
     push rbx
-    mov rax, 0 ; System call 0 for read
-    mov rdi, 0 ; File descriptor for stdin
-    mov rsi, InBuf ; Address of input buffer
-    mov rdx, lenIn ; Maximum length to read
-    syscall
+    call InputNumber
 
     mov rdi, InBuf; Pass address of input buffer to StrToInt64
     call StrToInt64
@@ -71,11 +57,8 @@ cycleInput2:
     push rcx ; сохраняем счетчик
     push rsi
     push rbx
-    mov rax, 0 ; System call 0 for read
-    mov rdi, 0 ; File descriptor for stdin
-    mov rsi, InBuf ; Address of input buffer
-    mov rdx, lenIn ; Maximum length to read
-    syscall
+    
+    call InputNumber
 
     mov rdi, InBuf; Pass address of input buffer to StrToInt64
     call StrToInt64
@@ -90,11 +73,7 @@ cycleInput2:
     loop cycleInput2 ; цикл по элементам столбца
 
     ; print line element's expectation
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, InputLineMsg
-    mov rdx, lenLineInput
-    syscall
+    call PrintInputLineMsg
 
     pop rcx
     add rbx, 16 ; перешли к следующей строке
@@ -122,18 +101,9 @@ cyclePrint1:
     call IntToStr64
 
     ; print the number    
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, OutBuf
-    mov rdx, lenOut
-    syscall
+    call PrintNumber
 
-    ; print the number    
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, Space
-    mov rdx, 1
-    syscall
+    call PrintSpace
 
     pop rsi
     pop rcx
@@ -147,19 +117,9 @@ cyclePrint2:
     mov rsi, OutBuf
     call IntToStr64
 
-    ; print the number    
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, OutBuf
-    mov rdx, lenOut
-    syscall
+    call PrintNumber
 
-    ; print the space    
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, Space
-    mov rdx, 1
-    syscall
+    call PrintSpace
 
     pop rsi
 
@@ -167,19 +127,12 @@ cyclePrint2:
     pop rcx
     loop cyclePrint2 ; цикл по элементам столбца
 
-    ; print the NewLine character
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, NewLine
-    mov rdx, 1
-    syscall
-
+    call PrintNewLine
     pop rcx
 
     add rbx, 16 ; перешли к следующей строке
     dec rcx
     jnz cyclePrint1 ; цикл по столбцам
-
 
     mov rax, 1
     mov rdi, 1
@@ -187,7 +140,6 @@ cyclePrint2:
     mov rdx, lenRes
     syscall
 
-    ;я ёбаный гений блять
     mov rbx, 0 ; смещение элемента столбца в строке
     mov rcx, 5 ; количество строк
 cycle1:
@@ -213,19 +165,8 @@ cycle2:
     mov rsi, OutBuf
     call IntToStr64
 
-    ; print the number    
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, OutBuf
-    mov rdx, lenOut
-    syscall
-
-    ; print the number
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, Space
-    mov rdx, 1
-    syscall
+    call PrintNumber
+    call PrintSpace
 
     pop rsi
     pop rcx
@@ -239,19 +180,8 @@ cyclePrintOut:
     mov rsi, OutBuf
     call IntToStr64
 
-    ; print the number    
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, OutBuf
-    mov rdx, lenOut
-    syscall
-
-    ; print the space    
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, Space
-    mov rdx, 1
-    syscall
+    call PrintNumber
+    call PrintSpace
 
     pop rsi
 
@@ -259,12 +189,7 @@ cyclePrintOut:
     pop rcx
    loop cyclePrintOut
 
-    ; print the NewLine    
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, NewLine
-    mov rdx, 1
-    syscall
+    call PrintNewLine
 
 if_zero:
     pop rcx ; восстановили счетчик
@@ -277,3 +202,52 @@ exit:
     mov rax, 60; системная функция 60 (exit)
     xor rdi, rdi; return code 0
     syscall; вызов системной функции
+
+
+PrintInputMsg:
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, InputMsg
+    mov rdx, lenInput
+    syscall
+    ret
+
+PrintInputLineMsg: ; print line element's expectation
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, InputLineMsg
+    mov rdx, lenLineInput
+    syscall
+    ret
+
+PrintSpace:    
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, Space
+    mov rdx, 1
+    syscall
+    ret
+
+PrintNumber:
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, OutBuf
+    mov rdx, lenOut
+    syscall
+    ret
+
+PrintNewLine:
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, NewLine
+    mov rdx, 1
+    syscall
+    ret
+
+InputNumber:
+    mov rax, 0 ; System call 0 for read
+    mov rdi, 0 ; File descriptor for stdin
+    mov rsi, InBuf ; Address of input buffer
+    mov rdx, lenIn ; Maximum length to read
+    syscall
+    ret
