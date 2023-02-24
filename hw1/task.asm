@@ -1,25 +1,32 @@
 section .data
-    input db "99abcd 47defg 26ghkl 53emka 10babk ", 0
+    input db 55 dup(0)
     len equ $-input
-    NewLine: db 0x0A
-    new_line db 10 ; define a new line character
 
 section .bss
     Buf resb 2 ; буфер для вводимой строки
-    out1 resb 6
+    out1 resb 6 
     out2 resb 6
-    OutBuf resb 100
+
+;99abcd 37defg 26ghkl 53emka 10babk 82ebka 02hero 24days
+;12yaza 54budu 47vsec 78htom 22ozhn 07ozab 51itne 01pyta
 
 section .text
 global _start
 
 _start:
-    mov rcx, 5
+; доделать ввод строки
+    mov rax, 0 ; System call 0 for read
+    mov rdi, 0 ; File descriptor for stdin
+    mov rsi, input ; Address of input buffer
+    mov rdx, len ; Maximum length to read
+    syscall
+
+    mov rcx, 8
     mov rbx, 0
 ExternCycle:
     push rcx
 
-    mov rcx, 4
+    mov rcx, 7
     mov rdx, 0
 InternCycle:
     push rcx

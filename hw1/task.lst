@@ -1,112 +1,125 @@
      1                                  section .data
-     2 00000000 393961626364203437-         input db "99abcd 47defg 26ghkl 53emka 10babk ", 0
-     2 00000009 646566672032366768-
-     2 00000012 6B6C203533656D6B61-
-     2 0000001B 2031306261626B2000 
-     3                                      len equ $-input
-     4 00000024 0A                          NewLine: db 0x0A
-     5 00000025 0A                          new_line db 10 ; define a new line character
+     2                                      ; input db "99abcd 47defg 26ghkl 53emka 10babk ", 0
+     3 00000000 000000000000000000-         input db 55 dup(0)
+     3 00000009 000000000000000000-
+     3 00000012 000000000000000000-
+     3 0000001B 000000000000000000-
+     3 00000024 000000000000000000-
+     3 0000002D 000000000000000000-
+     3 00000036 00                 
+     4                                      len equ $-input
+     5                                  
      6                                  
      7                                  section .bss
      8 00000000 ????                        Buf resb 2 ; буфер для вводимой строки
-     9 00000002 ????????????                out1 resb 6
+     9 00000002 ????????????                out1 resb 6 
     10 00000008 ????????????                out2 resb 6
-    11 0000000E <res 64h>                   OutBuf resb 100
-    12                                  
-    13                                  section .text
-    14                                  global _start
-    15                                  
-    16                                  _start:
-    17 00000000 B905000000                  mov rcx, 5
-    18 00000005 BB00000000                  mov rbx, 0
-    19                                  ExternCycle:
-    20 0000000A 51                          push rcx
-    21                                  
-    22 0000000B B904000000                  mov rcx, 4
-    23 00000010 BA00000000                  mov rdx, 0
-    24                                  InternCycle:
-    25 00000015 51                          push rcx
-    26                                  
-    27                                  ; в rbx содержится смещение от начала строки первой подстроки
-    28                                  ; в rdx содержится смещение от начала строки второй подстроки
-    29                                  
-    30 00000016 48BE-                       mov rsi, input  ; point to first character of the word
-    30 00000018 [0000000000000000] 
-    31 00000020 4801D6                      add rsi, rdx
-    32 00000023 48BF-                       mov rdi, out1 ; point to start of output buffer
-    32 00000025 [0200000000000000] 
-    33 0000002D 488B06                      mov rax, [rsi]  ; load current character into al
-    34 00000030 488907                      mov [rdi], rax
-    35                                      
-    36 00000033 48BE-                       mov rsi, input  ; point to first character of the word
-    36 00000035 [0000000000000000] 
-    37 0000003D 4801D6                      add rsi, rdx
-    38 00000040 4883C607                    add rsi, 7    ; add offset to the start of the word
-    39 00000044 48BF-                       mov rdi, out2 ; point to start of output buffer
-    39 00000046 [0800000000000000] 
-    40 0000004E 488B06                      mov rax, [rsi]  ; load current character into al
-    41 00000051 488907                      mov [rdi], rax
-    42                                  
-    43 00000054 56                          push rsi
-    44 00000055 57                          push rdi
-    45                                  
-    46 00000056 48BE-                       mov rsi, out1
-    46 00000058 [0200000000000000] 
-    47 00000060 48BF-                       mov rdi, out2
-    47 00000062 [0800000000000000] 
-    48 0000006A B902000000                  mov rcx, 2
-    49 0000006F FC                          cld
-    50 00000070 F3A6                        repe cmpsb
+    11                                  
+    12                                  ;99abcd 37defg 26ghkl 53emka 10babk 82ebka 02hero 24days 
+    13                                  ;12yaza 54budu 47vsec 78htom 22ozhn 07ozab 51itne 01pyta
+    14                                  
+    15                                  section .text
+    16                                  global _start
+    17                                  
+    18                                  _start:
+    19                                  ; доделать ввод строки
+    20 00000000 B800000000                  mov rax, 0 ; System call 0 for read
+    21 00000005 BF00000000                  mov rdi, 0 ; File descriptor for stdin
+    22 0000000A 48BE-                       mov rsi, input ; Address of input buffer
+    22 0000000C [0000000000000000] 
+    23 00000014 BA37000000                  mov rdx, len ; Maximum length to read
+    24 00000019 0F05                        syscall
+    25                                  
+    26 0000001B B908000000                  mov rcx, 8
+    27 00000020 BB00000000                  mov rbx, 0
+    28                                  ExternCycle:
+    29 00000025 51                          push rcx
+    30                                  
+    31 00000026 B907000000                  mov rcx, 7
+    32 0000002B BA00000000                  mov rdx, 0
+    33                                  InternCycle:
+    34 00000030 51                          push rcx
+    35                                  
+    36                                  ; в rbx содержится смещение от начала строки первой подстроки
+    37                                  ; в rdx содержится смещение от начала строки второй подстроки
+    38                                  
+    39 00000031 48BE-                       mov rsi, input  ; point to first character of the word
+    39 00000033 [0000000000000000] 
+    40 0000003B 4801D6                      add rsi, rdx
+    41 0000003E 48BF-                       mov rdi, out1 ; point to start of output buffer
+    41 00000040 [0200000000000000] 
+    42 00000048 488B06                      mov rax, [rsi]  ; load current character into al
+    43 0000004B 488907                      mov [rdi], rax
+    44                                      
+    45 0000004E 48BE-                       mov rsi, input  ; point to first character of the word
+    45 00000050 [0000000000000000] 
+    46 00000058 4801D6                      add rsi, rdx
+    47 0000005B 4883C607                    add rsi, 7    ; add offset to the start of the word
+    48 0000005F 48BF-                       mov rdi, out2 ; point to start of output buffer
+    48 00000061 [0800000000000000] 
+    49 00000069 488B06                      mov rax, [rsi]  ; load current character into al
+    50 0000006C 488907                      mov [rdi], rax
     51                                  
-    52 00000072 5F                          pop rdi
-    53 00000073 5E                          pop rsi
-    54 00000074 7C42                        jl no_swap
-    55                                  
-    56                                  swap:
-    57                                      ; надо подумать как сделать swap
-    58                                      ; осталось доделать swap и все будет ок
-    59                                  
-    60                                      ; copy out1 на место out2
-    61 00000076 B906000000                  mov	rcx, 6
-    62 0000007B 48BE-                       mov	rsi, out2
-    62 0000007D [0800000000000000] 
-    63 00000085 48BF-                       mov	rdi, input
-    63 00000087 [0000000000000000] 
-    64 0000008F 4801D7                      add rdi, rdx
-    65 00000092 FC                          cld
-    66 00000093 F3A4                        rep	movsb
-    67                                  
-    68                                      ;copy out2 на место out1
-    69 00000095 B906000000                  mov	rcx, 6
-    70 0000009A 48BE-                       mov	rsi, out1
-    70 0000009C [0200000000000000] 
-    71 000000A4 48BF-                       mov	rdi, input
-    71 000000A6 [0000000000000000] 
-    72 000000AE 4801D7                      add rdi, rdx
-    73 000000B1 4883C707                    add rdi, 7
-    74 000000B5 FC                          cld
-    75 000000B6 F3A4                        rep	movsb
+    52 0000006F 56                          push rsi
+    53 00000070 57                          push rdi
+    54                                  
+    55 00000071 48BE-                       mov rsi, out1
+    55 00000073 [0200000000000000] 
+    56 0000007B 48BF-                       mov rdi, out2
+    56 0000007D [0800000000000000] 
+    57 00000085 B902000000                  mov rcx, 2
+    58 0000008A FC                          cld
+    59 0000008B F3A6                        repe cmpsb
+    60                                  
+    61 0000008D 5F                          pop rdi
+    62 0000008E 5E                          pop rsi
+    63 0000008F 7C42                        jl no_swap
+    64                                  
+    65                                  swap:
+    66                                      ; надо подумать как сделать swap
+    67                                      ; осталось доделать swap и все будет ок
+    68                                  
+    69                                      ; copy out1 на место out2
+    70 00000091 B906000000                  mov	rcx, 6
+    71 00000096 48BE-                       mov	rsi, out2
+    71 00000098 [0800000000000000] 
+    72 000000A0 48BF-                       mov	rdi, input
+    72 000000A2 [0000000000000000] 
+    73 000000AA 4801D7                      add rdi, rdx
+    74 000000AD FC                          cld
+    75 000000AE F3A4                        rep	movsb
     76                                  
-    77                                  no_swap:
-    78 000000B8 4883C207                    add rdx, 7
-    79 000000BC 59                          pop rcx
-    80 000000BD 48FFC9                      dec rcx
-    81 000000C0 0F854FFFFFFF                jnz InternCycle
-    82                                  
-    83 000000C6 4883C307                    add rbx, 7
-    84 000000CA 59                          pop rcx
-    85 000000CB 48FFC9                      dec rcx
-    86 000000CE 0F8536FFFFFF            jnz ExternCycle
-    87                                  
-    88                                  done:
-    89 000000D4 B801000000                  mov	rax, 1	        ; файловый дескриптор (stdout)
-    90 000000D9 BF01000000                  mov	rdi, 1	        ; номер системного вызова (sys_write)
-    91 000000DE BA24000000                  mov	rdx, len	        ; длина сообщения
-    92 000000E3 48BE-                       mov	rsi, input	    ; сообщение для вывода на экран
-    92 000000E5 [0000000000000000] 
-    93 000000ED 0F05                        syscall
-    94                                  
-    95                                  exit:
-    96 000000EF B83C000000                  mov rax, 60; системная функция 60 (exit)
-    97 000000F4 4831FF                      xor rdi, rdi; return code 0
-    98 000000F7 0F05                        syscall; вызов системной функции
+    77                                      ;copy out2 на место out1
+    78 000000B0 B906000000                  mov	rcx, 6
+    79 000000B5 48BE-                       mov	rsi, out1
+    79 000000B7 [0200000000000000] 
+    80 000000BF 48BF-                       mov	rdi, input
+    80 000000C1 [0000000000000000] 
+    81 000000C9 4801D7                      add rdi, rdx
+    82 000000CC 4883C707                    add rdi, 7
+    83 000000D0 FC                          cld
+    84 000000D1 F3A4                        rep	movsb
+    85                                  
+    86                                  no_swap:
+    87 000000D3 4883C207                    add rdx, 7
+    88 000000D7 59                          pop rcx
+    89 000000D8 48FFC9                      dec rcx
+    90 000000DB 0F854FFFFFFF                jnz InternCycle
+    91                                  
+    92 000000E1 4883C307                    add rbx, 7
+    93 000000E5 59                          pop rcx
+    94 000000E6 48FFC9                      dec rcx
+    95 000000E9 0F8536FFFFFF            jnz ExternCycle
+    96                                  
+    97                                  done:
+    98 000000EF B801000000                  mov	rax, 1	        ; файловый дескриптор (stdout)
+    99 000000F4 BF01000000                  mov	rdi, 1	        ; номер системного вызова (sys_write)
+   100 000000F9 BA37000000                  mov	rdx, len	        ; длина сообщения
+   101 000000FE 48BE-                       mov	rsi, input	    ; сообщение для вывода на экран
+   101 00000100 [0000000000000000] 
+   102 00000108 0F05                        syscall
+   103                                  
+   104                                  exit:
+   105 0000010A B83C000000                  mov rax, 60; системная функция 60 (exit)
+   106 0000010F 4831FF                      xor rdi, rdi; return code 0
+   107 00000112 0F05                        syscall; вызов системной функции
