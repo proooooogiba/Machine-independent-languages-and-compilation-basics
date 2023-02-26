@@ -1,14 +1,25 @@
 %include "lib.asm"
 
 section .data; сегмент инициализированных переменных
-    ExitMsg db "Result is :",10 ; выводимое сообщение
-    lenExit equ $-ExitMsg
+    ResMsg db "Result is :",10 ; выводимое сообщение
+    lenRes equ $-ResMsg
     
-    AMsg db "Enter A : ", 0xa
+    AMsg db "Enter a: ", 0xa
     lenAMsg equ $-AMsg
 
-    BMsg db "Enter B : ", 0xa
+    BMsg db "Enter b: ", 0xa
     lenBMsg equ $-BMsg
+
+    StartMsg db `Computed expression\n if a^2 >= 4\n then a^2/b\n else a + b\n`
+    lenStart equ $-StartMsg
+
+    ZeroDiv db "Zero division is forbidden (B is zero)", 0xa
+    lenZeroDiv equ $-ZeroDiv
+
+    ExitMsg db "Goodbye, have a nice day", 0E2h, 098h, 0BAh, 0xa
+    lenExit equ $-ExitMsg
+
+
 
 ; сегмент неинициализированных переменных
 section .bss
@@ -24,6 +35,13 @@ section .bss
 section .text ; сегмент кода
 global _start
 _start:
+    ; write
+    mov rax, 1; системная функция 1 (write)
+    mov rdi, 1; дескриптор файла stdout=1
+    mov rsi, StartMsg ; адрес выводимой строки
+    mov rdx, lenStart ; длина строки
+    syscall; вызов системной функции
+
     ; write
     mov rax, 1; системная функция 1 (write)
     mov rdi, 1; дескриптор файла stdout=1
@@ -70,9 +88,20 @@ _start:
     imul rbx
     cmp rax, 4
     jl else; переходим если значение a^2 оказалось меньше 4
+    mov rdx, [B]
+    cmp rdx, 0
+    je zero_division
     idiv word [B]; we already have a^2 in rax
     mov [RES], rax
     jmp continue
+zero_division:
+    ; write
+    mov rax, 1; системная функция 1 (write)
+    mov rdi, 1; дескриптор файла stdout=1
+    mov rsi, ZeroDiv ; адрес выводимой строки
+    mov rdx, lenZeroDiv ; длина строки
+    syscall; вызов системной функции
+    jmp exit
 else:
     mov rax, [A]
     add rax, [B]
@@ -81,8 +110,8 @@ continue:
     ;ouput
     mov rax, 1; системная функция 1 (write)
     mov rdi, 1; дескриптор файла stdout=1
-    mov rsi, ExitMsg ; адрес выводимой строки
-    mov rdx, lenExit ; длина строки
+    mov rsi, ResMsg ; адрес выводимой строки
+    mov rdx, lenRes ; длина строки
     syscall; вызов системной функции    
 
     mov rsi, OutBuf; Pass address of output buffer to IntToStr64
@@ -96,6 +125,12 @@ continue:
     syscall; вызов системной функции
 
 exit:
+    mov rax, 1; системная функция 1 (write)
+    mov rdi, 1; дескриптор файла stdout=1
+    mov rsi, ExitMsg; адрес выводимой строки
+    mov rdx, lenExit ; длина строки
+    syscall; вызов системной функции
+
     mov rax, 60; системная функция 60 (exit)
     xor rdi, rdi; return code 0
     syscall; вызов системной функции
