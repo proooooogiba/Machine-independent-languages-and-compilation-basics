@@ -1,20 +1,27 @@
 %include "lib.asm"
 
 section .data; сегмент инициализированных переменных
-    ExitMsg db "Result is :",10 ; выводимое сообщение
-    lenExit equ $-ExitMsg
+    ResMsg db "Result is: d = " ; выводимое сообщение
+    lenRes equ $-ResMsg
+
+    StartMsg db "Calculate following expression d = a * x - 3 * (b + 3/k)"
+    lenStart equ $-StartMsg
     
-    AMsg db "Enter A : ", 0xa
+    AMsg db "Enter a= "
     lenAMsg equ $-AMsg
 
-    BMsg db "Enter B : ", 0xa
+    BMsg db "Enter b= "
     lenBMsg equ $-BMsg
 
-    KMsg db "Enter K : ", 0xa
+    KMsg db "Enter k= "
     lenKMsg equ $-KMsg
 
-    XMsg db "Enter X : ", 0xa
+    XMsg db "Enter x= "
     lenXMsg equ $-XMsg
+
+    ExitMsg db 0xa, `Goodbye, have a nice day`, 0E2h, 098h, 0BAh, 0xa
+    lenExit equ $-ExitMsg
+
 
 ; сегмент неинициализированных переменных
 section .bss
@@ -27,7 +34,7 @@ section .bss
     A   resb 10
     B   resb 10
     K   resb 10
-    RES resb 10
+    D   resb 10
 
 section .text ; сегмент кода
 global _start
@@ -117,7 +124,7 @@ _start:
     mov  rax, [A]; AX:=A
     mov  rbx, [X]; BX:=X
     imul rbx; AX:=A*X
-    mov [RES], rax; RES:=A*X
+    mov [D], rax; D:=A*X
     mov rax, 3; AX:= 3
     mov rbx, [K]; BX:= K
     idiv rbx; AX:=3/K
@@ -125,19 +132,19 @@ _start:
     add rax, rbx; AX:=3/K+B
     mov rbx, 3; BX:=3
     imul rbx; AX:=3*(3/K+B)
-    mov rbx, [RES]; BX:=RES
-    sub rbx, rax; RES:=A*X-3*(3/K+B)
-    ;SAVE IN RES
-    mov [RES], rbx
+    mov rbx, [D]; BX:=D
+    sub rbx, rax; D:=A*X-3*(3/K+B)
+    ;SAVE IN D
+    mov [D], rbx
     
     mov rax, 1; системная функция 1 (write)
     mov rdi, 1; дескриптор файла stdout=1
-    mov rsi, ExitMsg ; адрес выводимой строки
-    mov rdx, lenExit ; длина строки
+    mov rsi, ResMsg ; адрес выводимой строки
+    mov rdx, lenRes ; длина строки
     syscall; вызов системной функции    
 
     mov rsi, OutBuf; Pass address of output buffer to IntToStr64
-    mov rax, [RES]
+    mov rax, [D]
     call IntToStr64
 
     mov rax, 1; системная функция 1 (write)
@@ -147,6 +154,14 @@ _start:
     syscall; вызов системной функции
 
 exit:
+    ;write
+    mov rax, 1; системная функция 1 (write)
+    mov rdi, 1; дескриптор файла stdout=1
+    mov rsi, ExitMsg ; адрес выводимой строки
+    mov rdx, lenExit ; длина строки
+    syscall; вызов системной функции    
+
     mov rax, 60; системная функция 60 (exit)
     xor rdi, rdi; return code 0
     syscall; вызов системной функции
+
