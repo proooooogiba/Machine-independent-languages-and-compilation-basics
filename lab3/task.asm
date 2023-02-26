@@ -1,13 +1,13 @@
 %include "lib.asm"
 
 section .data; сегмент инициализированных переменных
-    ResMsg db "Result is :",10 ; выводимое сообщение
+    ResMsg db "Result is: f = " ; выводимое сообщение
     lenRes equ $-ResMsg
     
-    AMsg db "Enter a: ", 0xa
+    AMsg db "Enter a = "
     lenAMsg equ $-AMsg
 
-    BMsg db "Enter b: ", 0xa
+    BMsg db "Enter b = "
     lenBMsg equ $-BMsg
 
     StartMsg db `Computed expression\n if a^2 >= 4\n then a^2/b\n else a + b\n`
@@ -16,21 +16,20 @@ section .data; сегмент инициализированных переме�
     ZeroDiv db "Zero division is forbidden (B is zero)", 0xa
     lenZeroDiv equ $-ZeroDiv
 
-    ExitMsg db "Goodbye, have a nice day", 0E2h, 098h, 0BAh, 0xa
+    ExitMsg db 0xa, `Goodbye, have a nice day`, 0E2h, 098h, 0BAh, 0xa
     lenExit equ $-ExitMsg
-
 
 
 ; сегмент неинициализированных переменных
 section .bss
     InBuf resb 10 ; буфер для вводимой строки
-    OutBuf resb 4 ; буфер для выводимой строки
+    OutBuf resb 10 ; буфер для выводимой строки
     lenIn equ $-InBuf
     lenOut equ $-OutBuf
 
-    A   resb 10
-    B   resb 10
-    RES resb 10
+    A   resw 1
+    B   resw 1
+    RES resw 1
 
 section .text ; сегмент кода
 global _start
@@ -41,7 +40,7 @@ _start:
     mov rsi, StartMsg ; адрес выводимой строки
     mov rdx, lenStart ; длина строки
     syscall; вызов системной функции
-
+    
     ; write
     mov rax, 1; системная функция 1 (write)
     mov rdi, 1; дескриптор файла stdout=1
@@ -88,14 +87,15 @@ _start:
     imul rbx
     cmp rax, 4
     jl else; переходим если значение a^2 оказалось меньше 4
-    mov rdx, [B]
-    cmp rdx, 0
+    ;очень интересно, если заменить rcx на rdx ничего работать не будет
+    mov rcx, [B]
+    cmp rcx, 0
     je zero_division
     idiv word [B]; we already have a^2 in rax
     mov [RES], rax
     jmp continue
 zero_division:
-    ; write
+    ;write
     mov rax, 1; системная функция 1 (write)
     mov rdi, 1; дескриптор файла stdout=1
     mov rsi, ZeroDiv ; адрес выводимой строки
@@ -125,11 +125,12 @@ continue:
     syscall; вызов системной функции
 
 exit:
+    ;write
     mov rax, 1; системная функция 1 (write)
     mov rdi, 1; дескриптор файла stdout=1
-    mov rsi, ExitMsg; адрес выводимой строки
+    mov rsi, ExitMsg ; адрес выводимой строки
     mov rdx, lenExit ; длина строки
-    syscall; вызов системной функции
+    syscall; вызов системной функции    
 
     mov rax, 60; системная функция 60 (exit)
     xor rdi, rdi; return code 0
