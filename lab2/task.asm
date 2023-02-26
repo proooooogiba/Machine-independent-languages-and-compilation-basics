@@ -4,19 +4,22 @@ section .data; сегмент инициализированных переме�
     ResMsg db "Result is: d = " ; выводимое сообщение
     lenRes equ $-ResMsg
 
-    StartMsg db "Calculate following expression d = a * x - 3 * (b + 3/k)"
+    StartMsg db "Calculate following expression d = a * x - 3 * (b + 3/k)", 0xa
     lenStart equ $-StartMsg
+
+    ZeroDiv db "Zero division is forbidden (K is zero)", 0xa
+    lenZeroDiv equ $-ZeroDiv
     
-    AMsg db "Enter a= "
+    AMsg db "Enter a = "
     lenAMsg equ $-AMsg
 
-    BMsg db "Enter b= "
+    BMsg db "Enter b = "
     lenBMsg equ $-BMsg
 
-    KMsg db "Enter k= "
+    KMsg db "Enter k = "
     lenKMsg equ $-KMsg
 
-    XMsg db "Enter x= "
+    XMsg db "Enter x = "
     lenXMsg equ $-XMsg
 
     ExitMsg db 0xa, `Goodbye, have a nice day`, 0E2h, 098h, 0BAh, 0xa
@@ -39,6 +42,13 @@ section .bss
 section .text ; сегмент кода
 global _start
 _start:
+    ; write
+    mov rax, 1; системная функция 1 (write)
+    mov rdi, 1; дескриптор файла stdout=1
+    mov rsi, StartMsg ; адрес выводимой строки
+    mov rdx, lenStart ; длина строки
+    syscall; вызов системной функции
+    
     ; write
     mov rax, 1; системная функция 1 (write)
     mov rdi, 1; дескриптор файла stdout=1
@@ -99,7 +109,6 @@ _start:
     ;content of InBuf goes to rax
     mov [B], rax
 
-
     ;write
     mov rax, 1; системная функция 1 (write)
     mov rdi, 1; дескриптор файла stdout=1
@@ -118,9 +127,21 @@ _start:
     cmp rbx, 0
     jne 0
     ;content of InBuf goes to rax
+    cmp rax, 0 ; compare Kб which is in rax with zero
+    je zero_division
     mov [K], rax
+    jmp calculation
 
-    ;CALCULATIONS
+zero_division:
+    ;write
+    mov rax, 1; системная функция 1 (write)
+    mov rdi, 1; дескриптор файла stdout=1
+    mov rsi, ZeroDiv ; адрес выводимой строки
+    mov rdx, lenZeroDiv ; длина строки
+    syscall; вызов системной функции
+    jmp exit
+
+ calculation:
     mov  rax, [A]; AX:=A
     mov  rbx, [X]; BX:=X
     imul rbx; AX:=A*X
@@ -164,4 +185,3 @@ exit:
     mov rax, 60; системная функция 60 (exit)
     xor rdi, rdi; return code 0
     syscall; вызов системной функции
-
