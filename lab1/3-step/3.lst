@@ -1,0 +1,20 @@
+     1                                  section .data
+     2 00000000 FF                          val1 db 255
+     3 00000001 0001                        chart dw 256 
+     4 00000003 80FF                        lue3 dw -128 
+     5 00000005 10                          v5 db 10h 
+     6 00000006 25                          db 100101B 
+     7 00000007 17230C                      beta db 23,23h,0ch
+     8 0000000A 48656C6C6F0A                sdk db "Hello",10
+     9 00000010 0180                        min dw -32767 
+    10 00000012 78563412                    ar dd 12345678h 
+    11 00000016 08<rep 5h>                  valar times 5 db 8
+    12                                  section .bss
+    13 00000000 <res 14h>                  	alu resw 10
+    14 00000014 ??????????              	f1 resb 5
+    15 00000019 ????????                	X resd 1
+    16                                  section .text
+    17                                  	global _start
+    18                                       _start:
+    19 00000000 B83C000000              	mov rax, 60
+    20 00000005 0F05                        syscall

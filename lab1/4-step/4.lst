@@ -1,0 +1,20 @@
+     1                                  section .data
+     2 00000000 1900                    	A dw 25
+     3 00000002 DDFFFFFF                	B dd -35
+     4 00000006 D098D0B2D0B0D0BD20-     	C db "Иван Ivan"
+     4 0000000F 4976616E           
+     5 00000013 2500                    	D dw 25h
+     6 00000015 0025                    	E dw 2500h
+     7 00000017 FFFF                    	F1 dw 65535
+     8 00000019 FFFF0000                	F2 dd 65535
+     9                                  section .text
+    10                                  	global _start
+    11                                  _start:
+    12                                  	; add [F1], word 1
+    13                                  	; add [F2], dword 1
+    14 00000000 66B80500                	mov ax, 5
+    15                                  
+    16                                  exit:
+    17 00000004 B83C000000                  mov rax, 60; системная функция 60 (exit)
+    18 00000009 4831FF                      xor rdi, rdi; return code 0
+    19 0000000C 0F05                        syscall; вызов системной функции
