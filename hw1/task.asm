@@ -63,7 +63,7 @@ InternCycle:
 swap:
     ; надо подумать как сделать swap
     ; осталось доделать swap и все будет ок
-
+    
     ; copy out1 на место out2
     mov	rcx, 6
     mov	rsi, out2
