@@ -1,5 +1,4 @@
 # Machine-independent-languages-and-compilation-basics
-This repository is created for storage labs and homeworks for course 'Machine independent languages and compilation basics'
 
 ### **[Лабораторная работ №1. Изучение среды и отладчика ассембелера](https://github.com/proooooogiba/Machine-independent-languages-and-compilation-basics/tree/main/lab1)**
 Изученить процессы создания, запуска и отладки программ на ассемблере Nasm под управлением операционной системы Linux, а также особенностей описания и внутреннего представления данных.
